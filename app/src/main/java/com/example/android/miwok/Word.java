@@ -1,5 +1,8 @@
 package com.example.android.miwok;
 
+/*Primero se crea la Clase para seguidamente realizarle el xml (list_item) y por ultimo
+* se realiza el adaptador*/
+
 public class Word {
 
     /** Default translation for the word */

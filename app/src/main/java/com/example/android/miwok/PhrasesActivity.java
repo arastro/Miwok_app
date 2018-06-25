@@ -11,7 +11,18 @@ import java.util.ArrayList;
 
 public class PhrasesActivity extends AppCompatActivity {
 
-    MediaPlayer mediaPlayer;
+    /** Handles playback of all the sound files */
+    private MediaPlayer mMediaPlayer;
+
+    /**Este listener se activa cuando el {@link MediaPlayer} ha completado la reproducción del archivo de audio.*/
+    private MediaPlayer.OnCompletionListener mCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            /*Ahora que el archivo de sonido ha terminado de reproducirse, suelte
+             * los recursos del reproductor multimedia.*/
+            releaseMediaPlayer();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +41,7 @@ public class PhrasesActivity extends AppCompatActivity {
         words.add(new Word("Let’s go.", "yoowutis", R.raw.phrase_lets_go));
         words.add(new Word("Come here.", "әnni'nem", R.raw.phrase_come_here));
 
-        WordAdapter wordAdapter = new WordAdapter(this, words);
+        WordAdapter wordAdapter = new WordAdapter(this, words,R.color.category_phrases);
 
         ListView listView = (ListView) findViewById(R.id.listPhrases);
 
@@ -40,9 +51,30 @@ public class PhrasesActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Toast.makeText(ColorsActivity.this,"Lo que sea",Toast.LENGTH_SHORT).show();
-                mediaPlayer = MediaPlayer.create(PhrasesActivity.this,words.get(position).getAudioResourceId());
-                mediaPlayer.start();
+                releaseMediaPlayer();
+                mMediaPlayer = MediaPlayer.create(PhrasesActivity.this,words.get(position).getAudioResourceId());
+                mMediaPlayer.start();
+                mMediaPlayer.setOnCompletionListener(mCompletionListener);
             }
         });
     }
+
+    /**
+     * Limpie el reproductor multimedia liberando sus recursos.
+     */
+    private void releaseMediaPlayer() {
+        // Si el reproductor multimedia no es nulo, es posible que esté reproduciendo un sonido.
+        if (mMediaPlayer != null) {
+            /*Independientemente del estado actual del reproductor multimedia, libere
+             *sus recursos porque ya no lo necesitamos.*/
+            mMediaPlayer.release();
+
+            /*Establezca el reproductor multimedia de nuevo a nulo. Para nuestro código, hemos
+             *decidido que configurar el reproductor multimedia como nulo es una manera fácil de
+             * decir que el reproductor multimedia no está configurado para reproducir un archivo
+             * de audio en este momento.*/
+            mMediaPlayer = null;
+        }
+    }
+
 }
